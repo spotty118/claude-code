@@ -54,9 +54,9 @@ function extractDuplicateIssueNumber(commentBody: string): number | null {
   }
   
   // Try to match GitHub issue URL format: https://github.com/owner/repo/issues/123
-  match = commentBody.match(/github\.com\/[^\/]+\/[^\/]+\/issues\/(\d+)/);
+  match = commentBody.match(/github\.com\/([a-zA-Z0-9._-]+)\/([a-zA-Z0-9._-]+)\/issues\/(\d+)/);
   if (match) {
-    return parseInt(match[1], 10);
+    return parseInt(match[3], 10);
   }
   
   return null;
@@ -264,6 +264,9 @@ async function autoCloseDuplicates(): Promise<void> {
         `[ERROR] Failed to close issue #${issue.number} as duplicate: ${error}`
       );
     }
+
+    // Add a delay between issue closures to avoid overwhelming the GitHub API
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   console.log(
