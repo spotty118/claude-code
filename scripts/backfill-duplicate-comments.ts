@@ -92,6 +92,10 @@ Environment Variables:
   const maxIssueNumber = parseInt(process.env.MAX_ISSUE_NUMBER || "4050", 10);
   const minIssueNumber = parseInt(process.env.MIN_ISSUE_NUMBER || "1", 10);
   
+  if (isNaN(maxIssueNumber) || isNaN(minIssueNumber) || minIssueNumber >= maxIssueNumber) {
+    throw new Error(`Invalid issue number range: min=${minIssueNumber}, max=${maxIssueNumber}. MIN_ISSUE_NUMBER must be less than MAX_ISSUE_NUMBER and both must be valid numbers.`);
+  }
+  
   console.log(`[DEBUG] Repository: ${owner}/${repo}`);
   console.log(`[DEBUG] Dry run mode: ${dryRun}`);
   console.log(`[DEBUG] Looking at issues between #${minIssueNumber} and #${maxIssueNumber}`);
@@ -118,7 +122,7 @@ Environment Variables:
     // If the oldest issue in this page is still above our minimum, we need to continue
     // but if the oldest issue is below our minimum, we can stop
     const oldestIssueInPage = pageIssues[pageIssues.length - 1];
-    if (oldestIssueInPage && oldestIssueInPage.number >= maxIssueNumber) {
+    if (oldestIssueInPage && oldestIssueInPage.number >= minIssueNumber) {
       console.log(`[DEBUG] Oldest issue in page #${page} is #${oldestIssueInPage.number}, continuing...`);
     } else if (oldestIssueInPage && oldestIssueInPage.number < minIssueNumber) {
       console.log(`[DEBUG] Oldest issue in page #${page} is #${oldestIssueInPage.number}, below minimum, stopping`);
